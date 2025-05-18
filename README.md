@@ -1,4 +1,4 @@
-# Pro-(gect) 🚀  
+# Progect aka Pro-(gect) 🚀  
 *A Team Project for **Amazon Smbhav Hackathon 2024***
 
 This project, **Progect**, is a real-time object detection web application built for dynamic video streaming, object detection, and interactive user experiences. It allows users to stream live video, detect objects in real-time, and download detection logs—with customizable settings for enhanced control.
