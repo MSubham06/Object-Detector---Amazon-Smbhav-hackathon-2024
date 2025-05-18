@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Object Detection Video Stream</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+        }
+
+        /* Main container for three-column layout */
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 2fr 1fr;
+            gap: 20px;
+            width: 100%;
+            max-width: 1200px;
+            margin-top: 20px;
+        }
+
+        /* Left Column - Object Detection Data */
+        .left-column {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Middle Column - Camera Stream */
+        .middle-column {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Right Column - Controls and Download */
+        .right-column {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Style for video stream */
+        #video-frame {
+            width: 100%;
+            max-width: 640px;
+            height: auto;
+            border: 2px solid #333;
+        }
+
+        /* Controls and buttons */
+        button {
+            margin: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        /* Confidence slider */
+        #confidence-slider {
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <!-- Left Column: Object Detection Data -->
+        <div class="left-column">
+            <h3>Real-Time Object Detection Data</h3>
+            <div id="detection-data">
+                <!-- Dynamic detection data will be displayed here -->
+                <p>No data yet</p>
+            </div>
+        </div>
+        
+        <!-- Middle Column: Camera Stream -->
+        <div class="middle-column">
+            <h3>Live Video Feed</h3>
+            <img id="video-frame" src="/video_feed" alt="Video Feed">
+        </div>
+        
+        <!-- Right Column: Controls and Download -->
+        <div class="right-column">
+            <h3>Controls</h3>
+            <button onclick="startVideo()">Start Video</button>
+            <button onclick="stopVideo()">Stop Video</button>
+            <button onclick="pauseVideo()">Pause Video</button>
+
+            <h4>Confidence Threshold: <span id="confidence-value">0.8</span></h4>
+            <input type="range" id="confidence-slider" min="0.5" max="1.0" step="0.05" value="0.8" onchange="updateConfidence(this.value)">
+
+            <h4>Download Logs</h4>
+            <button onclick="downloadLogs()">Download Detection Logs</button>
+        </div>
+
+    </div>
+
+    <script>
+        let videoStreaming = false;
+        let paused = false;
+
+        function startVideo() {
+            if (!videoStreaming) {
+                videoStreaming = true;
+                sendControlCommand('start');
+            }
+        }
+
+        function stopVideo() {
+            if (videoStreaming) {
+                videoStreaming = false;
+                paused = false;
+                sendControlCommand('stop');
+                document.getElementById('video-frame').src = ""; // Clear the video feed
+            }
+        }
+
+        function pauseVideo() {
+            if (videoStreaming) {
+                paused = !paused;
+                sendControlCommand('pause');
+            }
+        }
+
+        function sendControlCommand(action) {
+            fetch('/control', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: action })
+            }).then(response => response.json())
+              .then(data => console.log(data.status))
+              .catch(error => console.error('Error:', error));
+
+            if (action === 'start') {
+                document.getElementById('video-frame').src = "/video_feed"; // Reload the video feed
+            }
+        }
+
+        function updateConfidence(value) {
+            document.getElementById('confidence-value').innerText = value;
+            fetch('/set_confidence', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ confidence: value })
+            }).then(response => response.json())
+              .then(data => console.log(data.status))
+              .catch(error => console.error('Error:', error));
+        }
+
+        // Simulate real-time detection data updates every few seconds
+        setInterval(() => {
+            const mockData = `Detected Object: ${Math.random().toFixed(2)} confidence`;
+            updateDetectionData(mockData);
+        }, 3000);
+
+        function updateDetectionData(data) {
+            const detectionDataDiv = document.getElementById('detection-data');
+            detectionDataDiv.innerHTML = `<p>${data}</p>`;
+        }
+
+        // Function to send log request to the server
+        function downloadLogs() {
+            window.location.href = '/download_logs';
+        }
+
+        // Send detection data to the server (for demo, we send mock data)
+        function sendDetectionData(objectType, speed, location, confidence) {
+            fetch('/log_detection', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ object_type: objectType, speed: speed, location: location, confidence: confidence })
+            }).then(response => response.json())
+              .then(data => console.log(data.status))
+              .catch(error => console.error('Error:', error));
+        }
+    </script>
+
+</body>
+</html>

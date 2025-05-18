@@ -1,0 +1,13 @@
+2024-11-12 21:31:39.311133: Detected person
+2024-11-12 21:31:49.844912: Detected cell phone
+2024-11-12 21:32:12.513242: Detected book
+2024-11-12 21:33:36.284742: Detected person
+2024-11-12 21:33:38.722618: Detected cell phone
+2024-11-12 21:33:50.607065: Detected car
+2024-11-13 09:38:21.202229: Detected person
+2024-11-13 09:38:32.414481: Detected cell phone
+2024-11-13 09:39:18.142871: Detected baseball bat
+2024-11-13 09:39:41.397394: Detected dog
+2024-11-13 09:52:38.801977: Detected person
+2024-11-13 09:52:54.660925: Detected cell phone
+2024-11-13 09:53:16.553631: Detected dog
